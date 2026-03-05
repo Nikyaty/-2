@@ -2,40 +2,52 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ミニにゃんこバトル</title>
+<title>ミニにゃんこ大戦争</title>
+
 <style>
 body{
     text-align:center;
     font-family:sans-serif;
-    background:#e0f7ff;
+    background:#dff6ff;
 }
 
 #game{
     position:relative;
-    width:800px;
+    width:900px;
     height:300px;
     margin:auto;
-    border:3px solid black;
-    background:#aee1ff;
+    border:4px solid black;
+    background:#a6e3ff;
     overflow:hidden;
 }
 
 .cat{
     position:absolute;
-    bottom:0;
-    left:50px;
+    bottom:40px;
     font-size:40px;
 }
 
 .enemy{
     position:absolute;
-    bottom:0;
-    right:0;
+    bottom:40px;
     font-size:40px;
 }
 
-button{
-    margin-top:10px;
+.base{
+    position:absolute;
+    bottom:0;
+    font-size:50px;
+}
+
+#playerBase{
+    left:0;
+}
+
+#enemyBase{
+    right:0;
+}
+
+#money{
     font-size:20px;
 }
 </style>
@@ -43,38 +55,91 @@ button{
 
 <body>
 
-<h1>ミニにゃんこバトル 🐱</h1>
+<h1>ミニにゃんこ大戦争 🐱</h1>
+
+<p id="money">お金: 100</p>
 
 <div id="game">
-<div id="cat" class="cat">🐱</div>
-<div id="enemy" class="enemy">👾</div>
+
+<div id="playerBase" class="base">🏠</div>
+<div id="enemyBase" class="base">🏰</div>
+
 </div>
 
-<button onclick="attack()">ネコ攻撃！</button>
-
-<p id="hp">敵HP: 10</p>
+<button onclick="spawnCat()">ネコ出撃 (50)</button>
 
 <script>
 
-let enemyHP = 10;
-let enemy = document.getElementById("enemy");
+let game = document.getElementById("game");
+let money = 100;
+let cats = [];
+let enemies = [];
 
-function attack(){
+function spawnCat(){
 
-    enemyHP--;
+    if(money < 50) return;
 
-    document.getElementById("hp").innerText = "敵HP: " + enemyHP;
+    money -= 50;
+    updateMoney();
 
-    enemy.style.right = (parseInt(enemy.style.right || 0) + 30) + "px";
+    let cat = document.createElement("div");
+    cat.className = "cat";
+    cat.innerText = "🐱";
+    cat.x = 60;
 
-    if(enemyHP <= 0){
-        alert("勝ち！🎉");
-        enemyHP = 10;
-        enemy.style.right = "0px";
-        document.getElementById("hp").innerText = "敵HP: 10";
-    }
-
+    game.appendChild(cat);
+    cats.push(cat);
 }
+
+function spawnEnemy(){
+
+    let enemy = document.createElement("div");
+    enemy.className = "enemy";
+    enemy.innerText = "👾";
+    enemy.x = 820;
+
+    game.appendChild(enemy);
+    enemies.push(enemy);
+}
+
+function updateMoney(){
+    document.getElementById("money").innerText = "お金: " + money;
+}
+
+setInterval(()=>{
+    money += 10;
+    updateMoney();
+},1000);
+
+setInterval(spawnEnemy,3000);
+
+function gameLoop(){
+
+    cats.forEach(cat=>{
+        cat.x += 1;
+        cat.style.left = cat.x + "px";
+    });
+
+    enemies.forEach(enemy=>{
+        enemy.x -= 1;
+        enemy.style.left = enemy.x + "px";
+    });
+
+    cats.forEach(cat=>{
+        enemies.forEach(enemy=>{
+            if(Math.abs(cat.x - enemy.x) < 30){
+
+                enemy.remove();
+                cat.remove();
+
+            }
+        });
+    });
+
+    requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
 
 </script>
 

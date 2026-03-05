@@ -2,138 +2,114 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<title>ミニにゃんこ大戦争</title>
+<title>カーゲーム</title>
 
 <style>
 body{
     text-align:center;
+    background:#87ceeb;
     font-family:sans-serif;
-    background:#dff6ff;
 }
 
 #game{
     position:relative;
-    width:900px;
-    height:300px;
+    width:400px;
+    height:600px;
     margin:auto;
-    border:4px solid black;
-    background:#a6e3ff;
+    background:#555;
     overflow:hidden;
+    border:5px solid black;
 }
 
-.cat{
+#car{
     position:absolute;
-    bottom:40px;
+    bottom:20px;
+    left:180px;
     font-size:40px;
 }
 
 .enemy{
     position:absolute;
-    bottom:40px;
     font-size:40px;
 }
 
-.base{
-    position:absolute;
-    bottom:0;
-    font-size:50px;
-}
-
-#playerBase{
-    left:0;
-}
-
-#enemyBase{
-    right:0;
-}
-
-#money{
-    font-size:20px;
+#score{
+    font-size:24px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>ミニにゃんこ大戦争 🐱</h1>
-
-<p id="money">お金: 100</p>
+<h1>カーゲーム 🚗</h1>
+<p>← → キーで車を動かす</p>
+<p id="score">スコア: 0</p>
 
 <div id="game">
-
-<div id="playerBase" class="base">🏠</div>
-<div id="enemyBase" class="base">🏰</div>
-
+<div id="car">🚗</div>
 </div>
-
-<button onclick="spawnCat()">ネコ出撃 (50)</button>
 
 <script>
 
+let car = document.getElementById("car");
 let game = document.getElementById("game");
-let money = 100;
-let cats = [];
+let carX = 180;
 let enemies = [];
+let score = 0;
 
-function spawnCat(){
+document.addEventListener("keydown", e => {
 
-    if(money < 50) return;
+    if(e.key === "ArrowLeft"){
+        carX -= 20;
+    }
 
-    money -= 50;
-    updateMoney();
+    if(e.key === "ArrowRight"){
+        carX += 20;
+    }
 
-    let cat = document.createElement("div");
-    cat.className = "cat";
-    cat.innerText = "🐱";
-    cat.x = 60;
+    if(carX < 0) carX = 0;
+    if(carX > 360) carX = 360;
 
-    game.appendChild(cat);
-    cats.push(cat);
-}
+    car.style.left = carX + "px";
+});
 
 function spawnEnemy(){
 
     let enemy = document.createElement("div");
     enemy.className = "enemy";
-    enemy.innerText = "👾";
-    enemy.x = 820;
+    enemy.innerText = "🚙";
+
+    enemy.x = Math.random() * 360;
+    enemy.y = -40;
+
+    enemy.style.left = enemy.x + "px";
+    enemy.style.top = enemy.y + "px";
 
     game.appendChild(enemy);
     enemies.push(enemy);
+
 }
 
-function updateMoney(){
-    document.getElementById("money").innerText = "お金: " + money;
-}
-
-setInterval(()=>{
-    money += 10;
-    updateMoney();
-},1000);
-
-setInterval(spawnEnemy,3000);
+setInterval(spawnEnemy,1000);
 
 function gameLoop(){
 
-    cats.forEach(cat=>{
-        cat.x += 1;
-        cat.style.left = cat.x + "px";
-    });
+    enemies.forEach(enemy => {
 
-    enemies.forEach(enemy=>{
-        enemy.x -= 1;
-        enemy.style.left = enemy.x + "px";
-    });
+        enemy.y += 4;
+        enemy.style.top = enemy.y + "px";
 
-    cats.forEach(cat=>{
-        enemies.forEach(enemy=>{
-            if(Math.abs(cat.x - enemy.x) < 30){
+        if(Math.abs(enemy.x - carX) < 40 && enemy.y > 520){
+            alert("ゲームオーバー 😢 スコア: " + score);
+            location.reload();
+        }
 
-                enemy.remove();
-                cat.remove();
+        if(enemy.y > 600){
+            enemy.remove();
+            score++;
+            document.getElementById("score").innerText = "スコア: " + score;
+        }
 
-            }
-        });
     });
 
     requestAnimationFrame(gameLoop);

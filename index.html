@@ -23,8 +23,6 @@ body{
 
 #car{
     position:absolute;
-    width:40px;
-    height:60px;
     bottom:20px;
     left:180px;
     font-size:40px;
@@ -32,8 +30,6 @@ body{
 
 .enemy{
     position:absolute;
-    width:40px;
-    height:60px;
     font-size:40px;
 }
 
@@ -62,17 +58,12 @@ let carX = 180;
 let enemies = [];
 let score = 0;
 
-let spawnTime = 1000; // 最初の出現スピード
+let spawnTime = 1000;
 
 document.addEventListener("keydown", function(e){
 
-    if(e.key === "ArrowLeft"){
-        carX -= 40;
-    }
-
-    if(e.key === "ArrowRight"){
-        carX += 40;
-    }
+    if(e.key === "ArrowLeft") carX -= 40;
+    if(e.key === "ArrowRight") carX += 40;
 
     if(carX < 0) carX = 0;
     if(carX > 360) carX = 360;
@@ -86,22 +77,28 @@ function spawnEnemy(){
     enemy.className = "enemy";
     enemy.innerText = "🚙";
 
-    enemy.x = Math.random() * 360;
+    enemy.x = Math.random()*360;
     enemy.y = -60;
 
-    enemy.style.left = enemy.x + "px";
-    enemy.style.top = enemy.y + "px";
+    enemy.style.left = enemy.x+"px";
+    enemy.style.top = enemy.y+"px";
 
     game.appendChild(enemy);
     enemies.push(enemy);
 }
 
 function enemySpawner(){
+
     spawnEnemy();
 
-    // 時間が経つと車が増える
-    if(spawnTime > 300){
-        spawnTime -= 20;
+    if(score > 30){
+        // カオスモード
+        for(let i=0;i<5;i++){
+            spawnEnemy();
+        }
+        spawnTime = 100;
+    }else{
+        spawnTime = 800;
     }
 
     setTimeout(enemySpawner, spawnTime);
@@ -127,18 +124,18 @@ function gameLoop(){
     enemies.forEach((enemy,i)=>{
 
         enemy.y += 4;
-        enemy.style.top = enemy.y + "px";
+        enemy.style.top = enemy.y+"px";
 
-        if(isCollision(car, enemy)){
-            alert("ゲームオーバー！ スコア: " + score);
+        if(isCollision(car,enemy)){
+            alert("ゲームオーバー！ スコア: "+score);
             location.reload();
         }
 
-        if(enemy.y > 600){
+        if(enemy.y>600){
             enemy.remove();
             enemies.splice(i,1);
             score++;
-            document.getElementById("score").innerText = "スコア: " + score;
+            document.getElementById("score").innerText="スコア: "+score;
         }
 
     });

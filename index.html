@@ -16,13 +16,15 @@ body{
     width:400px;
     height:600px;
     margin:auto;
-    background:#555;
+    background:#444;
     overflow:hidden;
     border:5px solid black;
 }
 
 #car{
     position:absolute;
+    width:40px;
+    height:60px;
     bottom:20px;
     left:180px;
     font-size:40px;
@@ -30,6 +32,8 @@ body{
 
 .enemy{
     position:absolute;
+    width:40px;
+    height:60px;
     font-size:40px;
 }
 
@@ -51,20 +55,21 @@ body{
 
 <script>
 
-let car = document.getElementById("car");
 let game = document.getElementById("game");
+let car = document.getElementById("car");
+
 let carX = 180;
 let enemies = [];
 let score = 0;
 
-document.addEventListener("keydown", e => {
+document.addEventListener("keydown", function(e){
 
     if(e.key === "ArrowLeft"){
-        carX -= 20;
+        carX -= 40;
     }
 
     if(e.key === "ArrowRight"){
-        carX += 20;
+        carX += 40;
     }
 
     if(carX < 0) carX = 0;
@@ -80,32 +85,45 @@ function spawnEnemy(){
     enemy.innerText = "🚙";
 
     enemy.x = Math.random() * 360;
-    enemy.y = -40;
+    enemy.y = -60;
 
     enemy.style.left = enemy.x + "px";
     enemy.style.top = enemy.y + "px";
 
     game.appendChild(enemy);
     enemies.push(enemy);
-
 }
 
 setInterval(spawnEnemy,1000);
 
+function isCollision(a,b){
+
+    let aRect = a.getBoundingClientRect();
+    let bRect = b.getBoundingClientRect();
+
+    return !(
+        aRect.top > bRect.bottom ||
+        aRect.bottom < bRect.top ||
+        aRect.right < bRect.left ||
+        aRect.left > bRect.right
+    );
+}
+
 function gameLoop(){
 
-    enemies.forEach(enemy => {
+    enemies.forEach((enemy,i)=>{
 
         enemy.y += 4;
         enemy.style.top = enemy.y + "px";
 
-        if(Math.abs(enemy.x - carX) < 40 && enemy.y > 520){
-            alert("ゲームオーバー 😢 スコア: " + score);
+        if(isCollision(car, enemy)){
+            alert("ゲームオーバー！ スコア: " + score);
             location.reload();
         }
 
         if(enemy.y > 600){
             enemy.remove();
+            enemies.splice(i,1);
             score++;
             document.getElementById("score").innerText = "スコア: " + score;
         }

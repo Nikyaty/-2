@@ -62,6 +62,8 @@ let carX = 180;
 let enemies = [];
 let score = 0;
 
+let spawnTime = 1000; // 最初の出現スピード
+
 document.addEventListener("keydown", function(e){
 
     if(e.key === "ArrowLeft"){
@@ -94,7 +96,18 @@ function spawnEnemy(){
     enemies.push(enemy);
 }
 
-setInterval(spawnEnemy,1000);
+function enemySpawner(){
+    spawnEnemy();
+
+    // 時間が経つと車が増える
+    if(spawnTime > 300){
+        spawnTime -= 20;
+    }
+
+    setTimeout(enemySpawner, spawnTime);
+}
+
+enemySpawner();
 
 function isCollision(a,b){
 

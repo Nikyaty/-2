@@ -92,7 +92,6 @@ function enemySpawner(){
     spawnEnemy();
 
     if(score > 30){
-        // カオスモード
         for(let i=0;i<5;i++){
             spawnEnemy();
         }
@@ -110,6 +109,16 @@ function isCollision(a,b){
 
     let aRect = a.getBoundingClientRect();
     let bRect = b.getBoundingClientRect();
+
+    // 敵の当たり判定を小さくする
+    let padding = 12;
+
+    bRect = {
+        top: bRect.top + padding,
+        bottom: bRect.bottom - padding,
+        left: bRect.left + padding,
+        right: bRect.right - padding
+    };
 
     return !(
         aRect.top > bRect.bottom ||
